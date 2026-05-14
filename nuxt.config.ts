@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
   modules: ['@nuxt/eslint', '@pinia/nuxt'],
-  css: ['@nordhealth/themes/lib/vet.css'],
+  css: ['@nordhealth/css', '@nordhealth/themes/lib/vet.css'],
   nitro: {
     prerender: {
       routes: ['/', '/success'],
