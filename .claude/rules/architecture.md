@@ -8,13 +8,14 @@ Nuxt 3 ships flat. Do not introduce FSD, vertical slices, monorepo segmentation,
 
 ```
 nordhealth-signup/
-├── pages/             # Vue route pages
-├── middleware/        # Nuxt route middleware
-├── composables/       # useXxx() functions, no global state
-├── stores/            # Pinia stores, cross-route state only
-├── plugins/           # Nuxt plugins (e.g., Nord DS registration)
-├── tests/             # Test files in three tiers (unit/integration/e2e)
-└── docs/adr/          # Architectural Decision Records
+├── app/                # srcDir (Nuxt 4 default)
+│   ├── pages/          # Vue route pages
+│   ├── middleware/     # Nuxt route middleware
+│   ├── composables/    # useXxx() functions, no global state
+│   ├── stores/         # Pinia stores, cross-route state only
+│   └── plugins/        # Nuxt plugins (e.g., Nord DS registration)
+├── tests/              # Test files in three tiers (unit/integration/e2e)
+└── docs/adr/           # Architectural Decision Records      # Architectural Decision Records
 ```
 
 ## What is forbidden
@@ -23,6 +24,7 @@ nordhealth-signup/
 - `src/modules/...` (Nuxt modules pattern, no module needed)
 - `components/` folder for a 3-field form (component splitting premature)
 - `types/` folder; co-locate types with their consumers
+- Nuxt 4 default `app/` srcDir is the contract; do not override with `srcDir: '.'`
 
 ## When to refactor toward FSD
 
