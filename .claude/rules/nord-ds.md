@@ -26,10 +26,10 @@ import '@nordhealth/components' // FORBIDDEN
 Use selective per-component imports:
 
 ```tsx
-import '@nordhealth/components/lib/input'
-import '@nordhealth/components/lib/button'
-import '@nordhealth/components/lib/checkbox'
-import '@nordhealth/components/lib/banner'
+import '@nordhealth/components/lib/Input'
+import '@nordhealth/components/lib/Button'
+import '@nordhealth/components/lib/Checkbox'
+import '@nordhealth/components/lib/Banner'
 ```
 
 Rationale: Nord docs explicitly recommend per-component imports. Tree-shaking behavior for the whole package is unverified; selective imports make the bundle surface explicit. Bundle delta to be measured via `nuxi analyze` before submission and documented in ADR-003.
