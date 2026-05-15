@@ -50,8 +50,10 @@ async function onSubmit(): Promise<void> {
             type="email"
             name="email"
             label="Email"
+            placeholder="you@example.com"
             autocomplete="email"
             required
+            hide-required
             expand
             :error="emailError"
             @input="onEmailInput"
@@ -65,8 +67,9 @@ async function onSubmit(): Promise<void> {
             label="Password"
             autocomplete="new-password"
             required
+            hide-required
             expand
-            hint="Use 15+ characters. A passphrase like 'correct horse battery staple' works."
+            hint="Use 15+ characters. A passphrase like ‘correct horse battery staple’ works."
             hint-below
             :error="passwordError"
             @input="onPasswordInput"
@@ -79,6 +82,10 @@ async function onSubmit(): Promise<void> {
             name="productUpdates"
             label="Send me product updates"
           />
+
+          <nord-visually-hidden role="status">
+            {{ submitting ? 'Signing up' : '' }}
+          </nord-visually-hidden>
 
           <nord-button
             type="submit"
