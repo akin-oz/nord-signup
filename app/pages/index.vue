@@ -1,8 +1,13 @@
 <script setup lang="ts">
+type FocusableInput = { focus: () => void }
+
 const email = ref('')
 const password = ref('')
 const productUpdates = ref(false)
 const submitting = ref(false)
+
+const emailInputRef = ref<FocusableInput | null>(null)
+const passwordInputRef = ref<FocusableInput | null>(null)
 
 const signupStore = useSignupStore()
 const { emailError, passwordError, validateEmail, validatePassword, clearError } =
@@ -27,7 +32,17 @@ function onPasswordInput(): void {
 async function onSubmit(): Promise<void> {
   const okEmail = validateEmail(email.value)
   const okPassword = validatePassword(password.value)
-  if (!okEmail || !okPassword) return
+  if (!okEmail || !okPassword) {
+    // Focus the first failed field (email wins on DOM order) so keyboard /
+    // AT users land at the field they need to fix instead of tab-walking
+    // back from the submit button.
+    if (okEmail) {
+      passwordInputRef.value?.focus()
+    } else {
+      emailInputRef.value?.focus()
+    }
+    return
+  }
 
   submitting.value = true
   // Simulated async submit per ADR-005 mechanism step 1.
@@ -46,6 +61,7 @@ async function onSubmit(): Promise<void> {
       <form novalidate @submit.prevent="onSubmit">
         <nord-stack gap="m">
           <nord-input
+            ref="emailInputRef"
             v-model="email"
             type="email"
             name="email"
@@ -61,6 +77,7 @@ async function onSubmit(): Promise<void> {
           />
 
           <nord-input
+            ref="passwordInputRef"
             v-model="password"
             type="password"
             name="password"
