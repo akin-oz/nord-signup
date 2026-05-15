@@ -3,8 +3,14 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   ssr: false,
+  app: {
+    head: {
+      htmlAttrs: { lang: 'en' },
+      title: 'Sign up · Nordhealth',
+    },
+  },
   modules: ['@nuxt/eslint', '@pinia/nuxt'],
-  css: ['@nordhealth/fonts/lib/fonts.css','@nordhealth/css', '@nordhealth/themes/lib/vet.css'],
+  css: ['@nordhealth/fonts/lib/fonts.css', '@nordhealth/css', '@nordhealth/themes/lib/vet.css'],
   nitro: {
     prerender: {
       routes: ['/', '/success'],
