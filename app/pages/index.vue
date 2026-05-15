@@ -38,46 +38,86 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <main>
-    <h1>Create your account</h1>
+  <main class="page">
+    <section class="form-card">
+      <h1>Create your account</h1>
+      <p class="sub">Start your free trial. We will not share your email.</p>
 
-    <form novalidate @submit.prevent="onSubmit">
-      <nord-input
-        v-model="email"
-        type="email"
-        name="email"
-        label="Email"
-        autocomplete="email"
-        required
-        :error="emailError"
-        @input="onEmailInput"
-        @blur="onEmailBlur"
-      />
+      <form novalidate @submit.prevent="onSubmit">
+        <nord-stack gap="m">
+          <nord-input
+            v-model="email"
+            type="email"
+            name="email"
+            label="Email"
+            autocomplete="email"
+            required
+            expand
+            :error="emailError"
+            @input="onEmailInput"
+            @blur="onEmailBlur"
+          />
 
-      <nord-input
-        v-model="password"
-        type="password"
-        name="password"
-        label="Password"
-        autocomplete="new-password"
-        required
-        hint="Use 15+ characters. A passphrase like 'correct horse battery staple' works."
-        hint-below
-        :error="passwordError"
-        @input="onPasswordInput"
-        @blur="onPasswordBlur"
-      />
+          <nord-input
+            v-model="password"
+            type="password"
+            name="password"
+            label="Password"
+            autocomplete="new-password"
+            required
+            expand
+            hint="Use 15+ characters. A passphrase like 'correct horse battery staple' works."
+            hint-below
+            :error="passwordError"
+            @input="onPasswordInput"
+            @blur="onPasswordBlur"
+          />
 
-      <nord-checkbox
-        v-model="productUpdates"
-        type="checkbox"
-        name="productUpdates"
-        label="Send me product updates"
-      />
+          <nord-checkbox
+            v-model="productUpdates"
+            type="checkbox"
+            name="productUpdates"
+            label="Send me product updates"
+          />
 
-      <nord-button type="submit" :disabled="submitting" :loading="submitting">
-        Sign up
-      </nord-button>
-    </form>
+          <nord-button
+            type="submit"
+            variant="primary"
+            expand
+            :disabled="submitting"
+            :loading="submitting"
+          >
+            Sign up
+          </nord-button>
+        </nord-stack>
+      </form>
+    </section>
   </main>
 </template>
+
+<style scoped>
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--n-space-xl) var(--n-space-l);
+}
+
+.form-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.form-card h1 {
+  font-size: var(--n-font-size-xl);
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--n-space-xs);
+}
+
+.sub {
+  margin: 0 0 var(--n-space-l);
+  color: var(--n-color-text-weaker);
+  font-size: var(--n-font-size-s);
+}
+</style>
