@@ -15,13 +15,19 @@ Performance budget for this submission:
 
 ## Alternatives considered — whole-package import
 
-`import '@nordhealth/components'` ships the entire DS (50+ components) for a 3-field form. Nord docs explicitly recommend per-component imports for this reason. Tree-shaking behavior for the bundled package is unverified — measured via `nuxi analyze` before commit:
+`import '@nordhealth/components'` ships the entire DS (50+ components) for a 3-field form. Nord docs explicitly recommend per-component imports for this reason. Tree-shaking behavior for the bundled package was measured empirically via `nuxi analyze` / `npm run build`:
 
-- Naive import baseline: [TO BE MEASURED FRIDAY]
-- Selective import: [TO BE MEASURED FRIDAY]
-- Delta: [TO BE DOCUMENTED HERE]
+| Asset                     | Whole import | Selective |                Delta |
+|---------------------------|-------------:|----------:|---------------------:|
+| Largest JS chunk          |       497 KB |    251 KB | **−246 KB (−49.5%)** |
+| Total JS (`_nuxt/*.js`)   |       513 KB |    267 KB | **−246 KB (−48.0%)** |
+| Total CSS (`_nuxt/*.css`) |        45 KB |     45 KB |        0 (identical) |
 
-If the delta is marginal, this ADR will be honestly revised: the measurement showed tree-shaking works; selective imports were chosen anyway for explicit dependency surface and readability.
+Numbers are uncompressed bytes. Gzip ratio for minified JS typically sits around 0.30–0.35, so the transferred delta on first load is ~75–85 KB gzipped — meaningful for a 4-component form.
+
+CSS bundle is identical across both modes. Nord components ship their styles inside their shadow DOM, baked into the JS modules — none of those styles enter the bundled CSS. The CSS bundle is dominated by `@nordhealth/css` + the VET theme + fonts, which are imported via `nuxt.config.ts`'s `css:[]` regardless of plugin shape. Selective imports therefore move only JS surface, not CSS.
+
+Tree-shaking demonstrably works: the 49% JS reduction confirms that selective path imports prevent unused components from entering the bundle. The explicit dependency surface — readable in the plugin file, auditable in PR diffs — remains the durable architectural benefit alongside the measurable size win.
 
 ## Empirical context — BCD measurements
 
