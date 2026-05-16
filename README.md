@@ -40,13 +40,25 @@ prerendered at build time so first paint isn't gated on JS. State is split
 across local refs, a `useSignupValidation()` composable, and one Pinia store
 that exists solely to hand transition state from `/` to `/success`. The Nord
 Design System ships the form's UI primitives via selective per-component
-imports (`Input`, `Button`, `Checkbox`, `Banner`). TypeScript runs in strict
-mode. Testing is three-tiered: Vitest for unit and integration, Playwright
-plus axe-core for end-to-end and accessibility. Deployment is Vercel static;
-GitHub Actions runs three parallel jobs (lint, unit, e2e) on every push and
-PR.
+imports (`Input`, `Button`, `Checkbox`, `Banner`, `Icon`, `Tooltip`, `Stack`,
+`VisuallyHidden`). TypeScript runs in strict mode. Testing is three-tiered:
+Vitest for unit and integration, Playwright plus axe-core for end-to-end and
+accessibility. Deployment is Vercel static; GitHub Actions runs three parallel
+jobs (lint, unit, e2e) on every push and PR.
 
 ## Decisions and assumptions
+
+**Nuxt 4, not Nuxt 3.** The brief asks for "a client-side only rendered Nuxt 3
+application." Nuxt 4.0 has been stable since July 2025 (this submission uses
+4.4.2), and Nuxt 3 reaches end-of-life on 31 July 2026 — about ten weeks
+after this submission. Starting a new project on a soon-to-be-EOL major
+version would have been the literal interpretation; starting on the current
+stable major is the responsible one. Nuxt 4 is a stability-focused release
+with backwards-compatible patterns (the `app/` directory was already
+available in Nuxt 3 via `compatibilityVersion: 4`), so the migration path
+between the two is small and most module documentation cross-applies.
+ADR-011 documents the exact version pin (4.4.2 rather than 4.4.5+, due to
+an upstream regression affecting `ssr: false` projects).
 
 **Architecture follows Nuxt conventions, not feature-sliced design.** A
 single-form, single-domain take-home doesn't carry the volatility load that
@@ -75,18 +87,28 @@ as invalid until the user types the TLD. Field errors render via Nord's
 `error` prop; non-field errors render via `<nord-banner>`. Two error classes,
 two surfaces, no mixing.
 
+**Password visibility toggle follows Nord's documented slot pattern.** The
+brief explicitly requests "a way to make the password visible." Implementation
+follows the Nord input.md example: a slotted `<nord-button slot="end" variant="plain" square>`
+holds two `<nord-icon>` elements (`interface-edit-on` when password is hidden,
+`interface-edit-off` when visible), each carrying a `label` attribute that
+gives the icon-only button its accessible name. A `<nord-tooltip>` paired
+via `aria-describedby` covers visual users. Toggle state lives in a local
+`ref<boolean>` and swaps the input's `type` between `password` and `text`.
+The CSS hides whichever icon doesn't match the current state. The toggle is
+presentation-layer only — validation timing (ADR-004) and the off-DOM
+probe (ADR-010) are unaffected.
+
 **The performance budget treats `ssr: false` as one lever, not the whole
 plan.** Both routes are prerendered to static HTML at build time, so the
 client gets a paintable shell before any JS evaluates. The dominant lever for
-a four-component form is keeping the Nord DS bundle small: selective imports
-of `Input`, `Button`, `Checkbox`, and `Banner` produce a measured **49% JS
-reduction** versus the whole-package import (497 KB → 251 KB on the largest
-chunk, verified via `nuxi analyze`). Nord component CSS lives in shadow DOM
-and never enters the bundled CSS, so selective imports move only JS surface.
-Nuxt's vendor splitting is automatic and additive. The Nuxt version is pinned
-exactly to `4.4.2` because `4.4.5` carries an unresolved upstream regression
-([nuxt/nuxt#35033](https://github.com/nuxt/nuxt/issues/35033)) that breaks
-`ssr: false` projects at dev-server boot.
+the form is keeping the Nord DS bundle small: selective imports of `Input`,
+`Button`, `Checkbox`, `Banner`, `Icon`, `Tooltip`, `Stack`, and
+`VisuallyHidden` produce a measured **49% JS reduction** versus the
+whole-package import (497 KB → 251 KB on the largest chunk, verified via
+`nuxi analyze`). Nord component CSS lives in shadow DOM and never enters the
+bundled CSS, so selective imports move only JS surface. Nuxt's vendor
+splitting is automatic and additive.
 
 **Route protection and test scope are scoped to what the brief actually
 asks.** `/success` is guarded by middleware that reads Pinia, not by URL state
@@ -94,14 +116,22 @@ asks.** `/success` is guarded by middleware that reads Pinia, not by URL state
 (implies authentication, which the brief doesn't request and which
 localStorage shouldn't back anyway). Refresh of `/success` finds an empty
 store and redirects to `/` — correct behavior for a transition page. Tests
-answer questions the form's own behavior raises: validation rules
-(Vitest unit), the store's read-once-then-clear contract that the middleware
-depends on (Vitest integration), and the full user flow plus route guard plus
+answer questions the form's own behavior raises: validation rules (Vitest
+unit), the store's read-once-then-clear contract that the middleware depends
+on (Vitest integration), and the full user flow plus route guard plus
 accessibility (Playwright + axe-core). What's deliberately not tested:
-Nord's built-in password visibility toggle (upstream behavior), exhaustive
-Tab-order suites (three fields and a button, axe-core covers labeling and
-focus indicators), and network-failure assertions on a mocked submission
-(mock-of-mock is tautological).
+exhaustive Tab-order suites (three fields, a toggle, and a submit button in
+natural DOM order, axe-core covers labeling and focus indicators) and
+network-failure assertions on a mocked submission (mock-of-mock is
+tautological).
+
+**Opt-in is captured, not echoed back.** The brief asks the user to be able
+to choose to receive product updates and to be presented with a success page
+after signup; it doesn't ask for the opt-in state to be displayed on the
+success page. The current `productUpdates` flag is captured in the form,
+would be sent to a backend at integration time, and is intentionally not
+surfaced on `/success`. Echoing it back would be a UX nicety, but the brief's
+separation of "opt-in here" and "see success page" was treated as deliberate.
 
 ## Three Claude suggestions I rejected
 
@@ -139,7 +169,7 @@ so the AI-augmented workflow is auditable in under 90 seconds.
 | 001 | [Claude Code usage strategy](docs/adr/001-claude-code-usage-strategy.md) | Strict execution boundary; modular `.claude/rules/` + three lifecycle hooks enforce the ADR audit trail mechanically. |
 | 002 | [Flat architecture](docs/adr/002-flat-architecture.md) | No FSD, no domain folders — Nuxt conventions are the structure for a one-form, one-domain project. |
 | 003 | [Performance budget](docs/adr/003-performance-budget.md) | `ssr: false` + prerender + selective Nord DS imports; measured −49% JS versus whole-package import. |
-| 004 | [Validation strategy](docs/adr/004-validation-strategy.md) | Nord built-in email validation, NIST 15-char password floor, on-blur per field, banner for non-field errors. |
+| 004 | [Validation strategy](docs/adr/004-validation-strategy.md) | Nord built-in email validation, NIST 15-char password floor, on-blur per field, banner for non-field errors. Password visibility toggle scope added on submission day. |
 | 005 | [Route guard with transient state](docs/adr/005-route-guard-with-transient-state.md) | Pinia + middleware for `/success`; rejected URL state (privacy) and localStorage (implies auth). |
 | 006 | [State placement principle](docs/adr/006-state-placement-principle.md) | Narrowest scope that satisfies the access pattern: local refs → composable → store, in that order. |
 | 007 | [Test strategy](docs/adr/007-test-strategy.md) | Vitest unit + integration, Playwright e2e + axe-core; tests answer real questions, no upstream coverage. |
@@ -188,12 +218,10 @@ nordhealth-signup/
 - **No password composition rules, no strength meter, no hints, no security
   questions.** All deprecated or forbidden by NIST SP 800-63B Rev 4 §3.1.1.2.
   Length is the rule.
-- **No tests for Nord's password visibility toggle.** That's upstream Nord DS
-  behavior; testing it tests their library, not this codebase.
-- **No exhaustive Tab-order test suite.** Three fields and a button in natural
-  DOM order; axe-core covers labeling and focus indicators. One targeted
-  keyboard test (Enter submits while focused in password) covers the dynamic
-  expectation that matters.
+- **No exhaustive Tab-order test suite.** Three fields, a toggle, and a
+  submit button in natural DOM order; axe-core covers labeling and focus
+  indicators. One targeted keyboard test (Enter submits while focused in
+  password) covers the dynamic expectation that matters.
 - **No network-failure assertions.** The submission is mocked, so asserting
   against the mock's failure mode would be tautological. The banner UI exists
   and is exercised by validation errors.
@@ -202,3 +230,12 @@ nordhealth-signup/
   take-home.
 - **No CSS overrides on Nord components.** Shadow DOM is treated as opaque per
   Nord's own guidance.
+- **No code coverage reporting (e.g. Codecov).** Vitest's built-in coverage
+  is configurable but the upload+badge surface was a v2 production-readiness
+  concern, scoped out of the take-home to keep the CI surface minimal.
+- **No granular component extraction (`<SignupForm>`, `<SuccessCard>`).** At
+  scale, the natural seams are visible (the form's `<nord-stack>` block, the
+  success card's icon+heading+subtitle group, the per-route page chrome).
+  Extraction is my default at scale; ADR-002 documents the deliberate
+  decision to keep this submission flat for a 3-field form with no reuse
+  surface. Seam analysis is part of the senior judgment, not its absence.
