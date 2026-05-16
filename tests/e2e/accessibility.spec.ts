@@ -16,8 +16,8 @@ test.describe('accessibility', () => {
   test('success page has no serious or critical axe violations', async ({ page }) => {
     // Drive the form to reach /success — direct visit redirects per ADR-005.
     await page.goto('/')
-    await page.getByLabel('Email').fill('test@example.com')
-    await page.getByLabel('Password').fill('correct-horse-battery-staple-15')
+    await page.getByRole('textbox', { name: 'Email' }).fill('test@example.com')
+    await page.getByRole('textbox', { name: 'Password' }).fill('correct-horse-battery-staple-15')
     await page.getByRole('button', { name: /sign up|create account/i }).click()
     await expect(page).toHaveURL('/success')
 

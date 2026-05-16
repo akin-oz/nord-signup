@@ -5,6 +5,7 @@ const email = ref('')
 const password = ref('')
 const productUpdates = ref(false)
 const submitting = ref(false)
+const passwordVisible = ref(false)
 
 const emailInputRef = ref<FocusableInput | null>(null)
 const passwordInputRef = ref<FocusableInput | null>(null)
@@ -79,7 +80,7 @@ async function onSubmit(): Promise<void> {
           <nord-input
             ref="passwordInputRef"
             v-model="password"
-            type="password"
+            :type="passwordVisible ? 'text' : 'password'"
             name="password"
             label="Password"
             autocomplete="new-password"
@@ -91,7 +92,27 @@ async function onSubmit(): Promise<void> {
             :error="passwordError"
             @input="onPasswordInput"
             @blur="onPasswordBlur"
-          />
+          >
+            <!-- slot="end" is the Web Components named-slot attribute (Nord pattern),
+                 not Vue's deprecated slot directive. -->
+            <!-- eslint-disable vue/no-deprecated-slot-attribute -->
+            <nord-button
+              slot="end"
+              type="button"
+              variant="plain"
+              square
+              aria-describedby="password-tooltip"
+              @click="passwordVisible = !passwordVisible"
+            >
+              <nord-icon name="interface-edit-on" label="Show password" />
+              <nord-icon name="interface-edit-off" label="Hide password" />
+            </nord-button>
+            <!-- eslint-enable vue/no-deprecated-slot-attribute -->
+          </nord-input>
+
+          <nord-tooltip id="password-tooltip">
+            {{ passwordVisible ? 'Hide password' : 'Show password' }}
+          </nord-tooltip>
 
           <nord-checkbox
             v-model="productUpdates"
@@ -143,5 +164,11 @@ async function onSubmit(): Promise<void> {
   margin: 0 0 var(--n-space-l);
   color: var(--n-color-text-weaker);
   font-size: var(--n-font-size-s);
+}
+
+/* Hide the inactive visibility-toggle icon so only one renders per state. */
+[type='password'] nord-icon[name='interface-edit-off'],
+[type='text'] nord-icon[name='interface-edit-on'] {
+  display: none;
 }
 </style>

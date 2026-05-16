@@ -10,8 +10,8 @@ test.describe('signup flow', () => {
     page,
   }) => {
     await page.goto('/')
-    await page.getByLabel('Email').fill(VALID_EMAIL)
-    await page.getByLabel('Password').fill(VALID_PASSWORD)
+    await page.getByRole('textbox', { name: 'Email' }).fill(VALID_EMAIL)
+    await page.getByRole('textbox', { name: 'Password' }).fill(VALID_PASSWORD)
     await page.getByRole('button', { name: /sign up|create account/i }).click()
 
     await expect(page).toHaveURL('/success')
@@ -31,8 +31,8 @@ test.describe('signup flow', () => {
 
   test('password under 15 chars is blocked with length error', async ({ page }) => {
     await page.goto('/')
-    await page.getByLabel('Email').fill(VALID_EMAIL)
-    await page.getByLabel('Password').fill(SHORT_PASSWORD)
+    await page.getByRole('textbox', { name: 'Email' }).fill(VALID_EMAIL)
+    await page.getByRole('textbox', { name: 'Password' }).fill(SHORT_PASSWORD)
     await page.getByRole('button', { name: /sign up|create account/i }).click()
 
     await expect(page).toHaveURL('/')
@@ -41,8 +41,8 @@ test.describe('signup flow', () => {
 
   test('invalid email format is blocked with format error', async ({ page }) => {
     await page.goto('/')
-    await page.getByLabel('Email').fill(INVALID_EMAIL)
-    await page.getByLabel('Password').fill(VALID_PASSWORD)
+    await page.getByRole('textbox', { name: 'Email' }).fill(INVALID_EMAIL)
+    await page.getByRole('textbox', { name: 'Password' }).fill(VALID_PASSWORD)
     await page.getByRole('button', { name: /sign up|create account/i }).click()
 
     await expect(page).toHaveURL('/')
@@ -57,8 +57,8 @@ test.describe('signup flow', () => {
 
   test('refresh on /success after signup redirects to / (transient state)', async ({ page }) => {
     await page.goto('/')
-    await page.getByLabel('Email').fill(VALID_EMAIL)
-    await page.getByLabel('Password').fill(VALID_PASSWORD)
+    await page.getByRole('textbox', { name: 'Email' }).fill(VALID_EMAIL)
+    await page.getByRole('textbox', { name: 'Password' }).fill(VALID_PASSWORD)
     await page.getByRole('button', { name: /sign up|create account/i }).click()
     await expect(page).toHaveURL('/success')
 
@@ -71,9 +71,9 @@ test.describe('signup flow', () => {
 
   test('Enter key on password field submits the form', async ({ page }) => {
     await page.goto('/')
-    await page.getByLabel('Email').fill(VALID_EMAIL)
-    await page.getByLabel('Password').fill(VALID_PASSWORD)
-    await page.getByLabel('Password').press('Enter')
+    await page.getByRole('textbox', { name: 'Email' }).fill(VALID_EMAIL)
+    await page.getByRole('textbox', { name: 'Password' }).fill(VALID_PASSWORD)
+    await page.getByRole('textbox', { name: 'Password' }).press('Enter')
 
     await expect(page).toHaveURL('/success')
   })
