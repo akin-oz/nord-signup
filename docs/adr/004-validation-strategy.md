@@ -44,3 +44,13 @@ When authentication becomes a real requirement, the middleware contract (`middle
 ## Origin
 
 **Akın-initiated** (overall pattern). localStorage alternative: Claude-suggested-rejected (initial Claude suggestion proposed localStorage for refresh-persistence; rejected after recognizing scope expansion into authentication).
+
+## Update — 16 May 2026
+
+The brief explicitly requires "a way to make the password visible". This was missed during the initial scope distillation (step 0); discovered during the final pre-submission brief re-read on submission day.
+
+The toggle is implemented via Nord's documented slot pattern from input.md: a slotted `<nord-button slot="end" variant="plain" square>` with two `<nord-icon>` elements (`interface-edit-on` for hidden state, `interface-edit-off` for visible state), each carrying a `label` attribute that provides the icon-only button its accessible name. A `<nord-tooltip>` paired via `aria-describedby` covers visual users. Toggle state lives in a local `ref<boolean>` and swaps the input's `type` attribute between `password` and `text`.
+
+This stays within ADR-002's flat architecture (no new component) and ADR-003's selective Nord imports (adds Icon + Tooltip, total 8 components, still well under the whole-package surface). Validation timing (ADR-004) and the off-DOM probe (ADR-010) are unaffected — the toggle is presentation-layer only.
+
+The visibility toggle was originally listed as a "deliberate omission" in this submission's polish-pass spec (step 7). The brief's literal text overrides that judgment; the README is updated to reflect this correctly rather than carrying the stale omission.
