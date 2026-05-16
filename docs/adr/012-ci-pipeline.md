@@ -20,9 +20,11 @@ Add a GitHub Actions workflow at `.github/workflows/ci.yml` that runs on every p
 2. **test-unit** — `npm run test:unit` (Vitest, ~300ms)
 3. **test-e2e** — `npm run test:e2e` (Playwright + axe-core, ~3s for 9 scenarios + 2 a11y scans)
 
-All three jobs run in parallel on `ubuntu-latest` with Node 22 (project's local version per `.nvmrc` or `package.json` engines, whichever is canonical). The unit and integration tests share the same job since both run via `vitest run` and the integration tier needs no extra setup beyond happy-dom (already in devDependencies).
+All three jobs run in parallel on `ubuntu-latest`. Node version is pinned exactly via `.nvmrc` (currently `22.17.1`); the workflow reads `node-version-file: '.nvmrc'` rather than declaring a version inline, so CI and local development share a single source of truth for the Node version. The unit and integration tests share the same job since both run via `vitest run` and the integration tier needs no extra setup beyond happy-dom (already in devDependencies).
 
 The e2e job installs the Chromium browser binary with system dependencies via `npx playwright install chromium --with-deps`. No browser cache because the run frequency is low; cache complexity for one job is over-engineering for a take-home.
+
+All jobs use `npm ci` (not `npm install`) for deterministic dependency resolution from `package-lock.json`. CI must not produce different install outputs than the lockfile declares.
 
 ## Alternatives considered
 
@@ -32,14 +34,19 @@ The e2e job installs the Chromium browser binary with system dependencies via `n
 
 **No CI at all.** Justifiable for a one-shot take-home that will not be maintained. Rejected because: (a) the submission already has 11 ADRs and a test suite, so the marginal cost of one more workflow file is low; (b) the absence of CI on a project that documents test strategy in its own ADR reads as decoration rather than infrastructure; (c) post-submission, this repo is part of Akın's portfolio under `akinoztorun.dev`, so it will live longer than the take-home review window.
 
+**Inline Node version declaration (`node-version: '22'`).** First-run CI failure surfaced the problem: GitHub Actions resolves `'22'` to the latest available patch, which can drift from the developer's local Node version. npm's transitive resolution differs across patch versions (observed: `@emnapi/core` and `crossws` resolved to different version constraints than the lockfile declared). Rejected in favor of exact pinning via `.nvmrc`.
+
 ## Consequences
 
 - Every push to `main` and every PR triggers the three-job workflow. Broken commits become visible immediately, not on the next pull.
 - Reviewer experience: a green badge in the README signals the submission has passed its own quality gates at the moment of submission, not just "passed locally at some point".
 - Cross-machine compatibility verified continuously: macOS local vs Ubuntu CI is the surface where ADR-008 (PascalCase casing) and ADR-009 (Nuxt 4 srcDir) discovered their drifts. CI runs on Ubuntu, so these decisions are validated on every push.
+- Node version is pinned in exactly one place (`.nvmrc`). Local environments using `nvm` pick up the correct version via `nvm use`; the CI workflow reads the same file. No drift surface.
 - One-time cost: ~10 minutes for workflow authoring + Playwright cache cold-start (one CI run downloads Chromium browser binaries).
-- Trade-off accepted: workflow uses Node 22 explicitly. If `package.json` engines field shifts later, the workflow needs an update too. The version is pinned in two places, but both are deliberate declarations rather than implicit defaults.
+- Trade-off accepted: pinning Node exactly trades dependency on patch-level updates for reproducibility. When the Node patch should change, `.nvmrc` is the single edit point — the workflow follows automatically.
 
 ## Origin
 
 Akın-initiated, Saturday morning submission integrity completion. The decision to add CI was made after the test infrastructure (steps 7a, 7b, 7c) and the skill-review compliance pass (commit a760e49) were complete — i.e., once the local test surface was provably reliable, the missing piece became the automated runner. Adding CI before the test infrastructure was complete would have been premature; adding it after the submission package is sealed would have been retroactive theater.
+
+The `.nvmrc` pin and the alternative-considered entry for inline Node version emerged from the first CI run's actual failure: a `npm ci` lockfile drift caused by Node patch version mismatch between local (22.17.1) and ubuntu-latest's resolution of `'22'`. The CI worked exactly as designed — it caught the kind of cross-machine drift that the ADR cited as motivation, on its first run.
