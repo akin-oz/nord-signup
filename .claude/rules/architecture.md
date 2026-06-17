@@ -7,7 +7,7 @@ Nuxt 3 ships flat. Do not introduce FSD, vertical slices, monorepo segmentation,
 ## Allowed directory structure
 
 ```
-nordhealth-signup/
+nord-signup/
 ├── app/                # srcDir (Nuxt 4 default)
 │   ├── pages/          # Vue route pages
 │   ├── middleware/     # Nuxt route middleware

@@ -1,17 +1,16 @@
-# Nordhealth Signup
+# Nord Signup
 
-Take-home submission for Nordhealth's Frontend Specialist role. A signup form
-implemented with the Nord Design System on Nuxt 4 + TypeScript + Pinia, deployed
-as a static SPA to Vercel.
+A signup form implemented with the Nord Design System on Nuxt 4 + TypeScript + Pinia,
+deployed as a static SPA to Vercel.
 
-[![CI](https://github.com/akin-oz/nordhealth-signup/actions/workflows/ci.yml/badge.svg)](https://github.com/akin-oz/nordhealth-signup/actions/workflows/ci.yml)
+[![CI](https://github.com/akin-oz/nord-signup/actions/workflows/ci.yml/badge.svg)](https://github.com/akin-oz/nord-signup/actions/workflows/ci.yml)
 
 ## Live demo
 
 https://nord-signup.akinoztorun.dev
 
-The take-home runs locally via `npm install && npm run dev`. The deployed
-version is provided as a convenience.
+Runs locally via `npm install && npm run dev`. The deployed version is provided
+as a convenience.
 
 ## Quick start
 
@@ -48,7 +47,7 @@ jobs (lint, unit, e2e) on every push and PR.
 
 ## Decisions and assumptions
 
-**Nuxt 4, not Nuxt 3.** The brief asks for "a client-side only rendered Nuxt 3
+**Nuxt 4, not Nuxt 3.** The design spec targeted "a client-side only rendered Nuxt 3
 application." Nuxt 4.0 has been stable since July 2025 (this submission uses
 4.4.2), and Nuxt 3 reaches end-of-life on 31 July 2026 — about ten weeks
 after this submission. Starting a new project on a soon-to-be-EOL major
@@ -182,7 +181,7 @@ so the AI-augmented workflow is auditable in under 90 seconds.
 ## Project layout
 
 ```
-nordhealth-signup/
+nord-signup/
 ├── app/                                # Nuxt 4 srcDir
 │   ├── app.vue
 │   ├── pages/

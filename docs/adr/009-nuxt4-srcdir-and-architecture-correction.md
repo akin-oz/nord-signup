@@ -29,7 +29,7 @@ The files are dead weight in their current location. Nuxt's auto-discovery only 
 ## Resulting tree
 
 ```
-nordhealth-signup/
+nord-signup/
 ├── app/                   # srcDir (Nuxt 4 default)
 │   ├── app.vue
 │   ├── pages/

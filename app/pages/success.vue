@@ -2,7 +2,7 @@
 definePageMeta({
   middleware: 'signup-complete',
 })
-useHead({ title: 'Welcome · Nordhealth' })
+useHead({ title: 'Welcome · Nord Signup' })
 
 const signupStore = useSignupStore()
 // Snapshot email before onMounted clears the store; the template binds

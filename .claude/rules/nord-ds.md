@@ -13,7 +13,7 @@ paths:
 
 ## Theme
 
-Use VET theme (per brief: "Please use the Nordhealth Design System - VET Theme appropriately!!"). Import path verified during implementation.
+Use VET theme. Import path verified during implementation.
 
 ## Component imports — selective only
 

@@ -1,6 +1,6 @@
-# Nordhealth Signup — Project Instructions
+# Nord Signup — Project Instructions
 
-You are working on a Nuxt 3 take-home for a senior frontend role. The project is small (one form, one success route) but the bar is high: every decision is documented as an ADR in `docs/adr/`, and the mechanical enforcement of those decisions lives in `.claude/rules/`.
+You are working on a Nuxt 4 portfolio project — a signup form built with the Nord Design System (one form, one success route). The bar is high: every decision is documented as an ADR in `docs/adr/`, and the mechanical enforcement of those decisions lives in `.claude/rules/`.
 
 ## Stop rules
 

@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: { lang: 'en' },
-      title: 'Sign up · Nordhealth',
+      title: 'Sign up · Nord Signup',
     },
   },
   modules: ['@nuxt/eslint', '@pinia/nuxt'],
