@@ -48,14 +48,14 @@ describe('useSignupValidation', () => {
       expect(passwordError.value).toBe('Password is required.')
       const result = validatePassword('a'.repeat(15))
       expect(result).toBe(true)
-      expect(passwordError.value).toBe('')
+      expect(passwordError.value).toBe(null)
     })
 
     it('returns true when value has 16 characters', () => {
       const { passwordError, validatePassword } = useSignupValidation()
       const result = validatePassword('a'.repeat(16))
       expect(result).toBe(true)
-      expect(passwordError.value).toBe('')
+      expect(passwordError.value).toBe(null)
     })
   })
 
@@ -83,7 +83,7 @@ describe('useSignupValidation', () => {
       clearError('password')
 
       expect(emailError.value).toBe('Email is required.')
-      expect(passwordError.value).toBe('')
+      expect(passwordError.value).toBe(null)
     })
   })
 
@@ -97,7 +97,7 @@ describe('useSignupValidation', () => {
       reset()
 
       expect(emailError.value).toBe('')
-      expect(passwordError.value).toBe('')
+      expect(passwordError.value).toBe(null)
     })
   })
 })

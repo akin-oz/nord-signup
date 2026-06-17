@@ -99,7 +99,6 @@ async function onSubmit(): Promise<void> {
             <nord-button
               slot="end"
               type="button"
-              variant="plain"
               square
               aria-describedby="password-tooltip"
               @click="passwordVisible = !passwordVisible"

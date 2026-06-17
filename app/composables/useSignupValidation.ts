@@ -6,7 +6,7 @@ const PASSWORD_MIN_LENGTH = 15
 
 export function useSignupValidation() {
   const emailError = ref('')
-  const passwordError = ref('')
+  const passwordError = ref(null)
 
   function validateEmail(value: string): boolean {
     if (!value) {
@@ -36,7 +36,7 @@ export function useSignupValidation() {
       passwordError.value = 'Password is too short. Use at least 15 characters.'
       return false
     }
-    passwordError.value = ''
+    passwordError.value = null
     return true
   }
 
@@ -45,12 +45,12 @@ export function useSignupValidation() {
       emailError.value = ''
       return
     }
-    passwordError.value = ''
+    passwordError.value = null
   }
 
   function reset(): void {
     emailError.value = ''
-    passwordError.value = ''
+    passwordError.value = null
   }
 
   return {
